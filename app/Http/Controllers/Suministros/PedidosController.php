@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Suministros;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Models\Suministros\{
     SPedido,
     SPedidoDetalle,
@@ -26,33 +25,6 @@ class PedidosController extends Controller
             'detalles.*.cantidad'    => 'required|integer|min:1',
         ]);
 
-        try {
-            $pedido = DB::transaction(function () use ($validated) {
-                $pedido = SPedido::create([
-                    'id_persona' => $validated['id_persona'],
-                    'id_destino' => $validated['id_destino'],
-                    'codigo'     => 'PE-' . strtoupper(bin2hex(random_bytes(4))),
-                    'tipo'       => $validated['tipo'],
-                    'modalidad'  => $validated['modalidad'],
-                    'total_cantidad' => 0,
-                    'total_monto'    => 0,
-                    'estado'     => 'CREADO'
-                ]);
-
-                $this->insertarDetalles($pedido, $validated['detalles']);
-
-                return $pedido->load('detalles');
-            });
-        } catch (\Throwable $e) {
-            Log::error('ERROR PEDIDOS', [
-                'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString()
-            ]);
-
-            throw $e;
-        }
-
-        /* 
         $pedido = DB::transaction(function () use ($validated) {
 
             $pedido = SPedido::create([
@@ -69,10 +41,11 @@ class PedidosController extends Controller
             $this->insertarDetalles($pedido, $validated['detalles']);
 
             return $pedido->load('detalles');
-        }); */
+        });
 
         return response()->json($pedido, 201);
     }
+
 
     private function insertarDetalles($pedido, $detalles)
     {
@@ -80,17 +53,20 @@ class PedidosController extends Controller
         $totalCant  = 0;
 
         foreach ($detalles as $item) {
+
             $material = SMaterial::findOrFail($item['id_material']);
 
-            $cantidad = (int)$item['cantidad'];
+            $cantidad = (int) $item['cantidad'];
 
-            $subtotal = $material->precio * $cantidad;
+            // ⚠️ BLINDAJE DECIMAL PARA POSTGRES
+            $precio   = round((float) $material->precio, 2);
+            $subtotal = round($precio * $cantidad, 2);
 
             SPedidoDetalle::create([
                 'id_pedido'   => $pedido->id_pedido,
                 'id_material' => $item['id_material'],
                 'cantidad'    => $cantidad,
-                'precio_unit' => $material->precio,
+                'precio_unit' => $precio,
                 'subtotal'    => $subtotal
             ]);
 
@@ -98,11 +74,13 @@ class PedidosController extends Controller
             $totalCant  += $cantidad;
         }
 
+        // ⚠️ también redondeamos el total final
         $pedido->update([
-            'total_monto'    => $totalMonto,
+            'total_monto'    => round($totalMonto, 2),
             'total_cantidad' => $totalCant
         ]);
     }
+
 
     public function showPedidoByIdPedido($id_pedido)
     {

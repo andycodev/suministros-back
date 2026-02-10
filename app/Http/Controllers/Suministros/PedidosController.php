@@ -46,27 +46,23 @@ class PedidosController extends Controller
         return response()->json($pedido, 201);
     }
 
-
     private function insertarDetalles($pedido, $detalles)
     {
         $totalMonto = 0;
         $totalCant  = 0;
 
         foreach ($detalles as $item) {
-
             $material = SMaterial::findOrFail($item['id_material']);
 
-            $cantidad = (int) $item['cantidad'];
+            $cantidad = (int)$item['cantidad'];
 
-            // ⚠️ BLINDAJE DECIMAL PARA POSTGRES
-            $precio   = round((float) $material->precio, 2);
-            $subtotal = round($precio * $cantidad, 2);
+            $subtotal = $material->precio * $cantidad;
 
             SPedidoDetalle::create([
                 'id_pedido'   => $pedido->id_pedido,
                 'id_material' => $item['id_material'],
                 'cantidad'    => $cantidad,
-                'precio_unit' => $precio,
+                'precio_unit' => $material->precio,
                 'subtotal'    => $subtotal
             ]);
 
@@ -74,13 +70,11 @@ class PedidosController extends Controller
             $totalCant  += $cantidad;
         }
 
-        // ⚠️ también redondeamos el total final
         $pedido->update([
-            'total_monto'    => round($totalMonto, 2),
+            'total_monto'    => $totalMonto,
             'total_cantidad' => $totalCant
         ]);
     }
-
 
     public function showPedidoByIdPedido($id_pedido)
     {

@@ -22,7 +22,7 @@ return [
     //'allowed_origins' => ['*'], // Para permitir cualquier origen temporalmente
 
     'allowed_origins' => [
-        //'https://tu-frontend.vercel.app', // URL de tu frontend (ejemplo Vercel o Netlify)
+        'https://suministros-front.onrender.com', // URL de tu frontend (ejemplo Vercel o Netlify)
         'http://localhost:5173',          // Para tus pruebas locales
         'https://suministros-back.onrender.com' // Tu propia URL de Render
     ],

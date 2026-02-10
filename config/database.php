@@ -96,6 +96,10 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'disable'),
+            'options' => [
+                PDO::ATTR_PERSISTENT => false, // Importante para transacciones limpias
+                PDO::ATTR_EMULATE_PREPARES => true, // Ayuda con la compatibilidad de tipos en Neon
+            ],
         ],
 
         'sqlsrv' => [

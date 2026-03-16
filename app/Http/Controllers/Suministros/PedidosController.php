@@ -427,7 +427,7 @@ class PedidosController extends Controller
         $request->validate([
             'nro_operacion'       => 'required|string',
             'monto_total_voucher' => 'required|numeric|min:0',
-            'comprobante_pago'    => 'nullable|mimes:jpg,jpeg,png,pdf|max:4096',
+            'comprobante_pago'    => 'required|mimes:jpg,jpeg,png,pdf|max:4096',
             'distribucion'        => 'required|array',
             'distribucion.*.id_pedido' => 'required|integer|exists:s_pedidos,id_pedido',
             'distribucion.*.monto'     => 'required|numeric|min:0.01',

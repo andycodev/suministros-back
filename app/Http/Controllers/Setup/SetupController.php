@@ -59,4 +59,6 @@ class SetupController extends Controller
         $iglesias = IglesiaIglesia::where('id_distrito', $id_distrito)->get();
         return $iglesias;
     }
+
+    
 }

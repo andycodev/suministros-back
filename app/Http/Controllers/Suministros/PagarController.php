@@ -36,12 +36,6 @@ class PagarController extends Controller
             $pedido->update(['estado' => 'PAGADO']);
         }
 
-        SPedidoEstado::create([
-            'id_pedido' => $pedido->id_pedido,
-            'estado'    => $estado,
-            'descripcion' => 'Webhook VisaNet'
-        ]);
-
         return response()->json(['message' => 'Webhook procesado']);
     }
 }

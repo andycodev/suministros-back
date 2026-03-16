@@ -26,6 +26,8 @@ Route::prefix('setup')->group(function () {
 
 Route::prefix('suministros')->group(function () {
 
+    Route::get('/periodos', [PedidosController::class, 'getPeriodos']);
+
     Route::get('/personas/buscar', [PersonasController::class, 'searchPersona']);
     Route::get('/personas/{id_persona}', [PersonasController::class, 'getPersonaById']);
 
@@ -33,11 +35,19 @@ Route::prefix('suministros')->group(function () {
     Route::get('/materiales-iglesias', [MaterialesController::class, 'getMaterialesIglesias']);
 
     Route::post('/pedidos', [PedidosController::class, 'store']);
+    Route::put('/pedidos/{id}', [PedidosController::class, 'update']);
+    Route::delete('/pedidos/{id}', [PedidosController::class, 'destroy']);
     Route::post('/pedidos/{id}/detalles', [PedidosController::class, 'agregarDetalles']);
     Route::get('/pedidos/{id_pedido}', [PedidosController::class, 'showPedidoByIdPedido']);
     Route::get('/pedidos/persona/{id_persona}', [PedidosController::class, 'showPedidoByIdPersona']);
     Route::get('/pedidos/destino/{id_destino}', [PedidosController::class, 'showPedidoByIdDestino']);
     Route::get('/pedidos/codigo/{codigo}', [PedidosController::class, 'showPedidoByCodigo']);
+
+    Route::post('pedidos/pago-abono', [PedidosController::class, 'pagoAbono']);
+    Route::post('pedidos/pago-pasarela', [PedidosController::class, 'pagoPasarela']);
+    Route::post('pedidos/pago-masivo', [PedidosController::class, 'pagoMasivo']);
+    Route::patch('pedidos/{id}/entregar', [PedidosController::class, 'marcarComoEntregado']);
+    Route::patch('pedidos/{id}/anular', [PedidosController::class, 'anularPedido']);
 
     /*    Route::post('/pedidos/{id}/pagar', [PedidosController::class, 'pagar']);
     Route::post('/pedidos/{id}/confirmar-pago', [PedidosController::class, 'confirmarPago']);
@@ -45,6 +55,6 @@ Route::prefix('suministros')->group(function () {
 });
 
 Route::prefix('reportes')->group(function () {
-
     Route::get('/mis-pedidos', [ReportController::class, 'getMisPedidos']);
+    Route::get('/mis-pedidos-pagos', [ReportController::class, 'getMisPedidosPagos']);
 });

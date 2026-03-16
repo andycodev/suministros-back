@@ -24,11 +24,14 @@ class AuthController extends Controller
 
         if ($persona) {
             return response()->json([
+                'success' => true,
+                'message' => 'Bienvenido ' . $persona->nombres . ' ' . $persona->ap_paterno . ' ' . $persona->ap_materno,
                 'id_persona' => $persona->id_persona,
                 'email' => $persona->email,
                 'documento' => $persona->documento,
                 'nombre' => $persona->nombres . ' ' . $persona->ap_paterno . ' ' . $persona->ap_materno,
                 'iglesia' => $persona->iglesia->nombre ?? 'N/A',
+                'id_iglesia' => $persona->iglesia->id_iglesia ?? null,
             ]);
         }
 

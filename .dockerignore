@@ -1,0 +1,27 @@
+# Docker
+Dockerfile
+docker-compose.yml
+docker-compose.override.yml
+
+# Docker volumes
+storage/
+bootstrap/cache/
+
+# Environment
+.env.local
+.env.production
+
+# Logs
+*.log
+
+# Cache
+vendor/
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

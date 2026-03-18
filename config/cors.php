@@ -24,6 +24,7 @@ return [
     'allowed_origins' => [
         'https://suministros-front.onrender.com', // URL de tu frontend (ejemplo Vercel, Netlify o Render)
         'http://localhost:5173',          // Para tus pruebas locales
+        'http://localhost:3000',          // Para tus pruebas locales
         'https://suministros-back.onrender.com' // Tu propia URL de Render
     ],
 

@@ -3,6 +3,7 @@ version: '3.8'
 services:
   app:
     container_name: suministros-back
+    image: suministros/backend:${TAG:-latest}
     build:
       context: .
       dockerfile: Dockerfile

@@ -9,18 +9,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:80"
-    volumes:
-      - ./storage:/var/www/html/storage
-     # - ./bootstrap/cache:/var/www/html/bootstrap/cache
     environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
-      # Configuración para DB (Deberás reemplazarlos con tus credenciales de DB)
+      - APP_ENV=production
       - DB_CONNECTION=pgsql
       - DB_HOST=${DB_HOST}
       - DB_PORT=5432
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
-      # Si DB requiere SSL (muy probable), añade esta variable:
       - DB_SSLMODE=require
+    restart: unless-stopped

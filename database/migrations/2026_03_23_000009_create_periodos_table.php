@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('s_periodos', function (Blueprint $table) {
+        Schema::create('periodos', function (Blueprint $table) {
             $table->bigInteger('id_periodo')->primary();
             $table->string('nombre', 50);
             $table->date('fecha_inicio');
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('s_periodos');
+        Schema::dropIfExists('periodos');
     }
 };

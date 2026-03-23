@@ -35,6 +35,14 @@ return new class extends Migration
             $table->foreign(['id_region'])->references(['id_region'])->on('iglesia_regions')->onUpdate('no action')->onDelete('no action');
             $table->foreign(['id_union'])->references(['id_union'])->on('iglesia_unions')->onUpdate('no action')->onDelete('no action');
         });
+
+        // 2. TRUCO: Aquí mismo activamos la relación en la tabla personas
+        Schema::table('personas', function (Blueprint $table) {
+            $table->foreign('id_iglesia')
+                ->references('id_iglesia')
+                ->on('iglesia_iglesias')
+                ->onDelete('set null'); // O 'no action' según prefieras
+        });
     }
 
     /**
@@ -42,6 +50,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Al revertir, primero quitamos la foránea de personas para evitar errores
+        Schema::table('personas', function (Blueprint $table) {
+            $table->dropForeign(['id_iglesia']);
+        });
+
         Schema::dropIfExists('iglesia_iglesias');
     }
 };

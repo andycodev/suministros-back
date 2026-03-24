@@ -8,8 +8,16 @@ use App\Http\Controllers\Suministros\MaterialesController;
 use App\Http\Controllers\Suministros\PedidosController;
 use App\Http\Controllers\Report\ReportController;
 
+/* Route::Middleware('auth:sanctum')->get('/', function () {
+    return view('welcome');
+}); */
+
+
 Route::prefix('auth')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login-2', [AuthController::class, 'login_2']);
 });
 
 Route::prefix('setup')->group(function () {

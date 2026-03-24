@@ -2,28 +2,45 @@
 
 namespace App\Traits;
 
-use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 trait ApiResponser
 {
-
-    function successResponse($data, $code = Response::HTTP_OK)
+    public function successResponse($data, $message = 'Operación exitosa.', $code = Response::HTTP_OK): JsonResponse
     {
-        // return response()->json(['data'=>$data,'message'=>$message,'success'=>$success], $code);
-        return response()->json($data, $code);
+        return response()->json([
+            'success' => true,
+            'data'    => $data,
+            'message' => $message,
+        ], $code);
     }
 
-    function errorResponse($exception, $code = Response::HTTP_UNPROCESSABLE_ENTITY, $data = null)
+    public function errorResponse($message, $code = Response::HTTP_INTERNAL_SERVER_ERROR, $data = null, $exception = null): JsonResponse
     {
-        Log::error($exception);
-        return response()->json(['data' => $data, 'message' => $exception->getMessage(), 'success' => false], $code);
+        if ($exception instanceof Throwable) {
+            Log::error("API Error: " . $exception->getMessage(), [
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine()
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => $message,
+            'data'    => $data,
+            'error'   => config('app.debug') && $exception ? $exception->getMessage() : null
+        ], $code);
     }
 
-    function validateResponse($exception, $code = Response::HTTP_UNPROCESSABLE_ENTITY, $data = null)
+    public function validationResponse($errors, $message = 'Los datos proporcionados no son válidos.'): JsonResponse
     {
-        return response()->json(['data' => $data, 'message' => $exception->getMessage(), 'success' => false], $code);
+        return response()->json([
+            'success' => false,
+            'message' => $message,
+            'data'    => $errors,
+        ], Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 }

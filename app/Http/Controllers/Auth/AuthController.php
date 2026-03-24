@@ -5,9 +5,35 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Suministros\SPersona;
+use App\Models\User;
 
 class AuthController extends Controller
 {
+    public function register()
+    {
+        $validated = request()->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6'
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password'])
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Usuario registrado exitosamente',
+            'user' => $user
+        ], 201);
+    }
+
+    public function login_2() {}
+
+    public function logout() {}
+
     public function login(Request $request)
     {
         $request->validate([

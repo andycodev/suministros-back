@@ -15,50 +15,48 @@ class SetupController extends Controller
     public function getIglesiaUnions()
     {
         $unions = IglesiaUnion::all();
-        return $unions;
+        return $this->successResponse($unions);
     }
 
     public function getIglesiaCampos()
     {
         $campos = IglesiaCampo::all();
-        return $campos;
+        return $this->successResponse($campos);
     }
 
     public function getIglesiaRegions()
     {
         $regions = IglesiaRegion::all();
-        return $regions;
+        return $this->successResponse($regions);
     }
 
     public function getIglesiaDistritos()
     {
         $distritos = IglesiaDistrito::all();
-        return $distritos;
+        return $this->successResponse($distritos);
     }
 
     public function getIglesiaIglesias()
     {
         $iglesias = IglesiaIglesia::all();
-        return $iglesias;
+        return $this->successResponse($iglesias);
     }
 
     public function getIglesiaCamposByUnion($id_union)
     {
         $campos = IglesiaCampo::where('id_union', $id_union)->get();
-        return $campos;
+        return $this->successResponse($campos);
     }
 
     public function getIglesiaDistritosByCampo($id_campo)
     {
         $distritos = IglesiaDistrito::where('id_campo', $id_campo)->get();
-        return $distritos;
+        return $this->successResponse($distritos);
     }
 
     public function getIglesiaIglesiasByDistrito($id_distrito)
     {
         $iglesias = IglesiaIglesia::where('id_distrito', $id_distrito)->get();
-        return $iglesias;
+        return $this->successResponse($iglesias);
     }
-
-    
 }

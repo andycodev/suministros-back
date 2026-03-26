@@ -4,13 +4,13 @@ namespace App\Models\Suministros;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SMaterial extends Model
+class Material extends Model
 {
-    protected $table = 's_materiales';
+    protected $table = 'materiales';
     protected $primaryKey = 'id_material';
 
     public function detalles()
     {
-        return $this->hasMany(SPedidoDetalle::class, 'id_material', 'id_material');
+        return $this->hasMany(PedidoDetalle::class, 'id_material', 'id_material');
     }
 }

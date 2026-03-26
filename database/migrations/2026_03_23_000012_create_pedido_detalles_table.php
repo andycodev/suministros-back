@@ -14,13 +14,17 @@ return new class extends Migration
     {
         Schema::create('pedido_detalles', function (Blueprint $table) {
             $table->bigIncrements('id_detalle');
-            $table->bigInteger('id_pedido');
-            $table->bigInteger('id_material');
+            $table->unsignedBigInteger('id_pedido');
+            $table->unsignedBigInteger('id_material');
             $table->integer('cantidad');
-            $table->decimal('precio_unit', 10);
-            $table->decimal('subtotal', 10);
-            $table->timestamp('created_at')->nullable()->default(DB::raw("now()"));
-            $table->timestamp('updated_at')->nullable()->default(DB::raw("now()"));
+            $table->decimal('precio_unit', 10, 2);
+            $table->decimal('subtotal', 10, 2);
+            $table->timestamps();
+
+            $table->foreign('id_pedido')
+                ->references('id_pedido')
+                ->on('pedidos')
+                ->onDelete('cascade');
         });
     }
 

@@ -13,14 +13,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('materiales', function (Blueprint $table) {
-            $table->bigIncrements('id_material');
+            $table->bigIncrements('id_material')->unsigned();
             $table->string('nombre', 150);
             $table->text('descripcion')->nullable();
             $table->decimal('precio', 10)->default(0);
             $table->char('tipo', 1)->default('P');
             $table->boolean('activo')->default(true);
-            $table->timestamp('created_at')->nullable()->default(DB::raw("now()"));
-            $table->timestamp('updated_at')->nullable()->default(DB::raw("now()"));
+            $table->timestamps();
         });
     }
 

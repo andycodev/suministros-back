@@ -4,9 +4,9 @@ namespace App\Models\Suministros;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SPedido extends Model
+class Pedido extends Model
 {
-    protected $table = 's_pedidos';
+    protected $table = 'pedidos';
     protected $primaryKey = 'id_pedido';
 
     protected $fillable = [
@@ -25,22 +25,22 @@ class SPedido extends Model
 
     public function persona()
     {
-        return $this->belongsTo(SPersona::class, 'id_persona', 'id_persona');
+        return $this->belongsTo(Persona::class, 'id_persona', 'id_persona');
     }
 
     public function destino()
     {
-        return $this->belongsTo(SPersona::class, 'id_destino', 'id_persona');
+        return $this->belongsTo(Persona::class, 'id_destino', 'id_persona');
     }
 
     public function detalles()
     {
-        return $this->hasMany(SPedidoDetalle::class, 'id_pedido', 'id_pedido');
+        return $this->hasMany(PedidoDetalle::class, 'id_pedido', 'id_pedido');
     }
 
     public function pagos()
     {
-        return $this->hasMany(SPedidoPago::class, 'id_pedido', 'id_pedido');
+        return $this->hasMany(PedidoPago::class, 'id_pedido', 'id_pedido');
     }
 
     protected $appends = ['total_pagado', 'saldo_pendiente']; // Estos campos se añaden al JSON

@@ -13,9 +13,10 @@ services:
       - APP_ENV=production
       - DB_CONNECTION=pgsql
       - DB_HOST=${DB_HOST}
-      - DB_PORT=5432
+      - DB_PORT=${DB_PORT:-5432}
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
-      - DB_SSLMODE=require
+      - DB_SSLMODE=${DB_SSLMODE:-disable}
+      - APP_TIMEZONE=${APP_TIMEZONE:-UTC}
     restart: unless-stopped

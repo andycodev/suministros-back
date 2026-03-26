@@ -6,34 +6,27 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Suministros\{
-    SPedido,
-    SPedidoDetalle,
-    SMaterial,
-    SPedidoPago,
-    SPeriodo
+    Pedido,
+    PedidoDetalle,
+    Material,
+    PedidoPago,
+    Periodo
 };
 use Exception;
 use Illuminate\Validation\Rule;
 
-class PedidosController extends Controller
+class PedidoController extends Controller
 {
-
-    public function getPeriodos()
-    {
-        $periodos = SPeriodo::orderBy('id_periodo', 'asc')->where('activo', true)->get();
-        return response()->json($periodos);
-    }
-
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'id_persona'       => 'required|integer|exists:s_personas,id_persona',
-            'id_destino'       => 'required|integer|exists:s_personas,id_persona',
+            'id_persona'       => 'required|integer|exists:personas,id_persona',
+            'id_destino'       => 'required|integer|exists:personas,id_persona',
             'id_periodo'       => [
                 'required',
                 'integer',
-                'exists:s_periodos,id_periodo',
-                Rule::unique('s_pedidos', 'id_periodo')->where(function ($query) use ($request) {
+                'exists:periodos,id_periodo',
+                Rule::unique('pedidos', 'id_periodo')->where(function ($query) use ($request) {
                     return $query->where('id_persona', $request->id_persona)
                         ->where('id_destino', $request->id_destino)
                         ->where('tipo', $request->tipo);
@@ -43,14 +36,14 @@ class PedidosController extends Controller
             'tipo'             => 'required|in:P,I', //P: Personal I:Iglesia
             'tipo_suscripcion' => 'required|in:F,V', //F: Fisico V: Virtual
             'detalles'         => 'required|array|min:1',
-            'detalles.*.id_material' => 'required|integer|exists:s_materiales,id_material',
+            'detalles.*.id_material' => 'required|integer|exists:materiales,id_material',
             'detalles.*.cantidad'    => 'required|integer|min:1',
         ], [
             'id_periodo.unique' => 'Ya existe un pedido de tipo ' . ($request->tipo == 'P' ? 'Personal' : 'Iglesia') . ' para este destino en el periodo seleccionado.'
         ]);
 
         $pedido = DB::transaction(function () use ($validated) {
-            $pedido = SPedido::create([
+            $pedido = Pedido::create([
                 'id_persona'       => $validated['id_persona'],
                 'id_destino'       => $validated['id_destino'],
                 'id_periodo'       => $validated['id_periodo'],
@@ -68,23 +61,23 @@ class PedidosController extends Controller
             return $pedido->load('detalles');
         });
 
-        return response()->json($pedido, 201);
+        return $this->successResponse($pedido, 'Pedido creado correctamente');
     }
 
     public function update(Request $request, $id)
     {
         // Buscamos el pedido
-        $pedido = SPedido::findOrFail($id);
+        $pedido = Pedido::findOrFail($id);
 
         $validated = $request->validate([
-            'id_persona'       => 'required|integer|exists:s_personas,id_persona',
-            'id_destino'       => 'required|integer|exists:s_personas,id_persona',
+            'id_persona'       => 'required|integer|exists:personas,id_persona',
+            'id_destino'       => 'required|integer|exists:personas,id_persona',
             'id_periodo'       => [
                 'required',
                 'integer',
-                'exists:s_periodos,id_periodo',
+                'exists:periodos,id_periodo',
                 // Regla de unicidad ignorando el registro actual
-                Rule::unique('s_pedidos', 'id_periodo')
+                Rule::unique('pedidos', 'id_periodo')
                     ->ignore($pedido->id_pedido, 'id_pedido') // Ignora este pedido
                     ->where(function ($query) use ($request) {
                         return $query->where('id_persona', $request->id_persona)
@@ -96,7 +89,7 @@ class PedidosController extends Controller
             'tipo'             => 'required|in:P,I',
             'tipo_suscripcion' => 'required|in:F,V',
             'detalles'         => 'required|array|min:1',
-            'detalles.*.id_material' => 'required|integer|exists:s_materiales,id_material',
+            'detalles.*.id_material' => 'required|integer|exists:materiales,id_material',
             'detalles.*.cantidad'    => 'required|integer|min:1',
         ], [
             'id_periodo.unique' => 'Ya existe otro pedido de tipo ' . ($request->tipo == 'P' ? 'Personal' : 'Iglesia') . ' para este destino en el periodo seleccionado.'
@@ -122,7 +115,7 @@ class PedidosController extends Controller
             return $pedido->fresh('detalles');
         });
 
-        return response()->json($pedido, 200);
+        return $this->successResponse($pedido, 'Pedido actualizado correctamente');
     }
 
     private function insertarDetalles($pedido, $detalles)
@@ -131,13 +124,13 @@ class PedidosController extends Controller
         $totalCant  = 0;
 
         foreach ($detalles as $item) {
-            $material = SMaterial::findOrFail($item['id_material']);
+            $material = Material::findOrFail($item['id_material']);
 
             $cantidad = (int)$item['cantidad'];
 
             $subtotal = $material->precio * $cantidad;
 
-            SPedidoDetalle::create([
+            PedidoDetalle::create([
                 'id_pedido'   => $pedido->id_pedido,
                 'id_material' => $item['id_material'],
                 'cantidad'    => $cantidad,
@@ -157,64 +150,62 @@ class PedidosController extends Controller
 
     public function destroy($id)
     {
-        $pedido = SPedido::findOrFail($id);
+        $pedido = Pedido::findOrFail($id);
 
         DB::transaction(function () use ($pedido) {
             $pedido->detalles()->delete();
             $pedido->delete();
         });
 
-        return response()->json([
-            'message' => 'Pedido eliminado con éxito.'
-        ], 200);
+        return $this->successResponse(null, 'Pedido eliminado con éxito.');
     }
 
     public function showPedidoByIdPedido($id_pedido)
     {
-        $pedido = SPedido::with(['detalles.material', 'persona', 'destino'])
+        $pedido = Pedido::with(['detalles.material', 'persona', 'destino'])
             ->where('id_pedido', $id_pedido)
             ->first();
 
-        return response()->json($pedido ?? []);
+        return $this->successResponse($pedido ?? [], 'Pedido obtenido correctamente');
     }
 
     public function showPedidoByIdPersona($id_persona)
     {
-        $pedidos = SPedido::with(['detalles.material', 'persona', 'destino'])
+        $pedidos = Pedido::with(['detalles.material', 'persona', 'destino'])
             ->where('id_persona', $id_persona)
             ->where('estado', 'CREADO')
             ->whereIn('tipo', ['P', 'I'])
             ->get();
 
-        return response()->json($pedidos);
+        return $this->successResponse($pedidos, 'Pedidos obtenidos correctamente');
     }
 
     public function showPedidoByIdDestino($id_destino)
     {
-        $pedidos = SPedido::with(['detalles.material', 'persona', 'destino'])
+        $pedidos = Pedido::with(['detalles.material', 'persona', 'destino'])
             ->where('id_destino', $id_destino)
             ->where('estado', 'CREADO')
             ->whereIn('tipo', ['P', 'I'])
             ->get();
 
-        return response()->json($pedidos);
+        return $this->successResponse($pedidos);
     }
 
     /*  public function showPedidoByIdPersona($id_persona)
     {
-        $pedido = SPedido::with(['detalles.material', 'persona'])
+        $pedido = Pedido::with(['detalles.material', 'persona'])
             ->where('id_persona', $id_persona)
             ->where('estado', 'CREADO')
             ->first();
 
-        return response()->json($pedido ?: []);
+        return $this->successResponse($pedido ?: [], 'Pedido obtenido correctamente');
     } */
 
 
     public function pagoAbono(Request $request)
     {
         $request->validate([
-            'id_pedido'      => 'required|exists:s_pedidos,id_pedido',
+            'id_pedido'      => 'required|exists:pedidos,id_pedido',
             'monto'          => 'required|numeric|min:0.1',
             'transaccion_id' => 'nullable|string|max:100',
             'metodo_pago'    => 'nullable|in:EFECTIVO,YAPE,PLIN,TRANSFERENCIA,TARJETA'
@@ -222,7 +213,7 @@ class PedidosController extends Controller
 
         return DB::transaction(function () use ($request) {
             // Bloqueamos la fila para evitar que dos admins registren pagos al mismo tiempo
-            $pedido = SPedido::lockForUpdate()->findOrFail($request->id_pedido);
+            $pedido = Pedido::lockForUpdate()->findOrFail($request->id_pedido);
 
             // --- VALIDACIONES ---
             if (in_array($pedido->estado, ['ANULADO', 'ENTREGADO'])) {
@@ -256,7 +247,7 @@ class PedidosController extends Controller
                 };
 
                 // 1. Buscamos el último pago registrado en este año, ordenando por ID de forma descendente
-                $ultimoPago = SPedidoPago::whereYear('created_at', $anioActual)
+                $ultimoPago = PedidoPago::whereYear('created_at', $anioActual)
                     ->orderBy('id_pago', 'desc') // Usamos el ID de la tabla que es autoincremental y único
                     ->first();
 
@@ -273,7 +264,7 @@ class PedidosController extends Controller
             }
 
             // --- REGISTRO DEL PAGO ---
-            SPedidoPago::create([
+            PedidoPago::create([
                 'id_pedido'      => $pedido->id_pedido,
                 'monto'          => $request->monto,
                 'transaccion_id' => $transaccionId,
@@ -304,9 +295,9 @@ class PedidosController extends Controller
     {
         // 1. VALIDACIÓN ESTRUCTURAL BASE
         $request->validate([
-            'id_pedido'      => 'required|exists:s_pedidos,id_pedido',
+            'id_pedido'      => 'required|exists:pedidos,id_pedido',
             'monto'          => 'required|numeric|min:0.1',
-            'transaccion_id' => 'nullable|string|unique:s_pedido_pagos,transaccion_id',
+            'transaccion_id' => 'nullable|string|unique:pedido_pagos,transaccion_id',
             'estado_visanet' => 'required|in:AUTORIZADO,DENEGADO,PENDIENTE',
             'metodo_pago'    => 'required|in:VISA,MASTERCARD,PAGO_EFECTIVO',
             'raw_response'   => 'required|array'
@@ -335,7 +326,7 @@ class PedidosController extends Controller
         // 3. PROCESAMIENTO DE TRANSACCIÓN
         return DB::transaction(function () use ($request) {
             // Bloqueo para evitar colisiones en Neon/PostgreSQL
-            $pedido = SPedido::lockForUpdate()->findOrFail($request->id_pedido);
+            $pedido = Pedido::lockForUpdate()->findOrFail($request->id_pedido);
 
             // --- VALIDACIONES DE NEGOCIO ---
             if (in_array($pedido->estado, ['ANULADO', 'ENTREGADO'])) {
@@ -367,7 +358,7 @@ class PedidosController extends Controller
                 };
 
                 // 1. Buscamos el último pago del año para obtener el número correlativo real
-                $ultimoPago = SPedidoPago::whereYear('created_at', $anioActual)
+                $ultimoPago = PedidoPago::whereYear('created_at', $anioActual)
                     ->orderBy('id_pago', 'desc')
                     ->first();
 
@@ -383,7 +374,7 @@ class PedidosController extends Controller
             }
 
             // --- REGISTRO DEL PAGO ---
-            SPedidoPago::create([
+            PedidoPago::create([
                 'id_pedido'      => $pedido->id_pedido,
                 'monto'          => $request->monto,
                 'transaccion_id' => $transaccionId,
@@ -429,7 +420,7 @@ class PedidosController extends Controller
             'monto_total_voucher' => 'required|numeric|min:0',
             'comprobante_pago'    => 'required|mimes:jpg,jpeg,png,pdf|max:4096',
             'distribucion'        => 'required|array',
-            'distribucion.*.id_pedido' => 'required|integer|exists:s_pedidos,id_pedido',
+            'distribucion.*.id_pedido' => 'required|integer|exists:pedidos,id_pedido',
             'distribucion.*.monto'     => 'required|numeric|min:0.01',
         ]);
 
@@ -463,7 +454,7 @@ class PedidosController extends Controller
 
                 foreach ($request->distribucion as $item) {
                     // Bloqueamos el pedido para evitar que otro proceso cambie el saldo al mismo tiempo
-                    $pedido = SPedido::lockForUpdate()->findOrFail($item['id_pedido']);
+                    $pedido = Pedido::lockForUpdate()->findOrFail($item['id_pedido']);
 
                     // --- VALIDACIONES DE NEGOCIO ---
 
@@ -489,7 +480,7 @@ class PedidosController extends Controller
                     }
 
                     // --- 3. REGISTRO DEL PAGO ---
-                    $pago = SPedidoPago::create([
+                    $pago = PedidoPago::create([
                         'id_pedido'        => $pedido->id_pedido,
                         'monto'            => $montoAbono,
                         'metodo_pago'      => 'TRANSFERENCIA',
@@ -538,7 +529,7 @@ class PedidosController extends Controller
 
     public function marcarComoEntregado($id)
     {
-        $pedido = SPedido::findOrFail($id);
+        $pedido = Pedido::findOrFail($id);
 
         // Validación de negocio: Solo se entrega lo que está pagado
         if ($pedido->estado !== 'PAGADO') {
@@ -557,7 +548,7 @@ class PedidosController extends Controller
 
     public function anularPedido($id)
     {
-        $pedido = SPedido::findOrFail($id);
+        $pedido = Pedido::findOrFail($id);
 
         // Un pedido ENTREGADO no debería anularse sin un proceso de devolución previo
         if ($pedido->estado === 'ENTREGADO') {
@@ -575,7 +566,7 @@ class PedidosController extends Controller
 
     public function showPedidoByCodigo($codigo)
     {
-        $pedido = SPedido::with(['detalles.material', 'persona', 'pagos'])
+        $pedido = Pedido::with(['detalles.material', 'persona', 'pagos'])
             ->where('codigo', $codigo)
             ->first();
 
@@ -590,7 +581,7 @@ class PedidosController extends Controller
 
     /* public function estadoPorCodigo($codigo)
     {
-        $pedido = SPedido::where('codigo', $codigo)->firstOrFail();
+        $pedido = Pedido::where('codigo', $codigo)->firstOrFail();
         return response()->json(['estado' => $pedido->estado]);
     } */
 }

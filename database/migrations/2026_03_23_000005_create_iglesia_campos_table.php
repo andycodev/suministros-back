@@ -12,16 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('iglesia_campos', function (Blueprint $table) {
-            $table->bigInteger('id_campo')->primary();
+            $table->unsignedBigInteger('id_campo')->primary();
             $table->string('nombre', 500);
             $table->string('siglas', 50)->nullable();
             $table->boolean('activo')->default(true);
-            $table->bigInteger('id_union');
-            $table->bigInteger('id_organizacion')->nullable();
+            $table->unsignedBigInteger('id_union');
+            $table->unsignedBigInteger('id_organizacion')->nullable();
             $table->timestamps();
 
-            $table->foreign(['id_organizacion'])->references(['id_organizacion'])->on('organizacions')->onUpdate('no action')->onDelete('no action');
-            $table->foreign(['id_union'])->references(['id_union'])->on('iglesia_unions')->onUpdate('no action')->onDelete('no action');
+            $table->foreign('id_organizacion')->references('id_organizacion')->on('organizacions');
+            $table->foreign('id_union')->references('id_union')->on('iglesia_unions');
         });
     }
 

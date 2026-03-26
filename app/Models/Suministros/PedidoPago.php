@@ -5,11 +5,11 @@ namespace App\Models\Suministros;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class SPedidoPago extends Model
+class PedidoPago extends Model
 {
     use HasFactory;
 
-    protected $table = 's_pedido_pagos';
+    protected $table = 'pedido_pagos';
     protected $primaryKey = 'id_pago';
 
     // Desactivamos timestamps si tu tabla solo usa fecha_pago, 
@@ -36,10 +36,10 @@ class SPedidoPago extends Model
     // Relación con el pedido
     public function pedido()
     {
-        return $this->belongsTo(SPedido::class, 'id_pedido');
+        return $this->belongsTo(Pedido::class, 'id_pedido');
     }
 
-    // Al final de tu modelo SPedidoPago.php
+    // Al final de tu modelo PedidoPago.php
 
     protected $appends = ['url_completa_comprobante'];
 

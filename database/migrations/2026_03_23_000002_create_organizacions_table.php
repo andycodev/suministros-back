@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('siglas', 50)->nullable();
             $table->boolean('activo')->default(true);
             $table->string('lugar', 2000);
-            $table->bigInteger('id_entidad')->nullable();
+            $table->unsignedBigInteger('id_entidad')->nullable();
             $table->string('id_depto')->nullable();
-            $table->bigInteger('id_corporacion')->nullable();
+            $table->unsignedBigInteger('id_corporacion')->nullable();
             $table->timestamps();
 
             $table->foreign('id_corporacion')->references('id_corporacion')->on('corporacions');

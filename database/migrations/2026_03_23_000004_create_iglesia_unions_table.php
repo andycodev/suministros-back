@@ -12,15 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('iglesia_unions', function (Blueprint $table) {
-            $table->bigInteger('id_union')->primary();
+            $table->unsignedBigInteger('id_union')->primary();
             $table->string('nombre', 500);
             $table->string('siglas', 50)->nullable();
             $table->boolean('activo')->default(true);
             $table->integer('orden')->default(0);
-            $table->bigInteger('id_organizacion')->nullable();
+            $table->unsignedBigInteger('id_organizacion')->nullable();
             $table->timestamps();
 
-            $table->foreign(['id_organizacion'])->references(['id_organizacion'])->on('organizacions')->onUpdate('no action')->onDelete('no action');
+            $table->foreign('id_organizacion')->references('id_organizacion')->on('organizacions');
         });
     }
 

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Suministros\SPersona;
+use App\Models\Suministros\Persona;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -41,7 +41,7 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        $persona = SPersona::with('iglesia')
+        $persona = Persona::with('iglesia')
             ->where('email', $request->email)
             ->where('documento', $request->password)
             ->first();
@@ -69,7 +69,7 @@ class AuthController extends Controller
 
     public function showPersonaById($id_persona)
     {
-        $persona = SPersona::with([
+        $persona = Persona::with([
             'iglesia',
             'iglesia.union',
             'iglesia.campo',

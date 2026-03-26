@@ -9,7 +9,7 @@ use Throwable;
 
 trait ApiResponser
 {
-    public function successResponse($data, $message = 'Operación exitosa.', $code = Response::HTTP_OK): JsonResponse
+    public function successResponse($data, $message = null, $code = Response::HTTP_OK): JsonResponse
     {
         return response()->json([
             'success' => true,

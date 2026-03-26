@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Suministros\{
-    SPedido,
-    SPedidoDetalle,
-    SMaterial
+    Pedido,
+    PedidoDetalle,
+    Material
 };
 
 class ReportController extends Controller
@@ -19,7 +19,7 @@ class ReportController extends Controller
             'id_persona' => 'required|integer'
         ]);
 
-        $pedidos = SPedido::with(['detalles.material', 'persona', 'destino.iglesia', 'pagos'])
+        $pedidos = Pedido::with(['detalles.material', 'persona', 'destino.iglesia', 'pagos'])
             ->where('id_persona', $request->id_persona)
 
             ->when($request->tipo, function ($query, $tipo) {
@@ -52,7 +52,7 @@ class ReportController extends Controller
             'id_persona' => 'required|integer'
         ]);
 
-        $pedidos = SPedido::with(['detalles.material', 'persona', 'destino.iglesia', 'pagos'])
+        $pedidos = Pedido::with(['detalles.material', 'persona', 'destino.iglesia', 'pagos'])
             ->where('id_persona', $request->id_persona)
             // Filtro fijo para estados específicos
             ->whereIn('estado', ['PENDIENTE', 'CREADO'])

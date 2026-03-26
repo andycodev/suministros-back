@@ -4,46 +4,52 @@ namespace App\Http\Controllers\Suministros;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Suministros\SPersona;
+use App\Models\Suministros\Persona;
 use App\Models\Suministros\SPersonaUbicacion;
 
-class PersonasController extends Controller
+class PersonaController extends Controller
 {
 
     public function searchPersona(Request $request)
     {
         $validated = $request->validate([
-            'id_union'     => 'required|integer',
-            'id_campo'     => 'required|integer',
-            'id_distrito'  => 'required|integer',
-            'id_iglesia'   => 'required|integer',
-            'documento'    => 'required|digits:8|regex:/^[0-9]+$/',
+            'id_union'    => 'required|integer',
+            'id_campo'    => 'required|integer',
+            'id_distrito' => 'required|integer',
+            'id_iglesia'  => 'required|integer',
+            'documento'   => 'required|string|min:3|max:15|regex:/^[a-zA-Z0-9]+$/',
         ]);
 
-        $query = SPersona::query();
+        $query = Persona::query();
 
-        $query->join('iglesia_iglesias as ii', 'ii.id_iglesia', '=', 's_personas.id_iglesia')
+        $query->join('iglesia_iglesias as ii', 'ii.id_iglesia', '=', 'personas.id_iglesia')
             ->join('iglesia_distritos as idis', 'idis.id_distrito', '=', 'ii.id_distrito')
             ->join('iglesia_campos as ic', 'ic.id_campo', '=', 'ii.id_campo')
             ->join('iglesia_unions as iu', 'iu.id_union', '=', 'ii.id_union');
 
-        $query->select('s_personas.*');
+        $query->select('personas.*');
 
-        $query->where('s_personas.documento', $validated['documento']);
+        $query->where('personas.documento', 'LIKE', '%' . $validated['documento'] . '%');
 
-        $query->where('iu.id_union', $validated['id_union']);
-        $query->where('ic.id_campo', $validated['id_campo']);
-        $query->where('idis.id_distrito', $validated['id_distrito']);
-        $query->where('ii.id_iglesia', $validated['id_iglesia']);
+        $query->where([
+            ['iu.id_union',      $validated['id_union']],
+            ['ic.id_campo',      $validated['id_campo']],
+            ['idis.id_distrito', $validated['id_distrito']],
+            ['ii.id_iglesia',    $validated['id_iglesia']],
+        ]);
 
         $query->with(['iglesia']);
 
-        return response()->json($query->limit(30)->get());
+        $personas = $query->limit(30)->get();
+
+        $mensaje = $personas->isNotEmpty() ? 'Personas encontradas' : 'No se encontraron resultados';
+
+        return $this->successResponse($personas, $mensaje);
     }
 
     public function getPersonaById($id_persona)
     {
-        $persona = SPersona::with([
+        $persona = Persona::with([
             'iglesia',
             'iglesia.union',
             'iglesia.campo',

@@ -3,9 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Setup\SetupController;
-use App\Http\Controllers\Suministros\PersonasController;
-use App\Http\Controllers\Suministros\MaterialesController;
-use App\Http\Controllers\Suministros\PedidosController;
+use App\Http\Controllers\Suministros\PersonaController;
+use App\Http\Controllers\Suministros\MaterialController;
+use App\Http\Controllers\Suministros\PedidoController;
+use App\Http\Controllers\Suministros\PeriodoController;
 use App\Http\Controllers\Report\ReportController;
 
 /* Route::Middleware('auth:sanctum')->get('/', function () {
@@ -34,32 +35,33 @@ Route::prefix('setup')->group(function () {
 
 Route::prefix('suministros')->group(function () {
 
-    Route::get('/periodos', [PedidosController::class, 'getPeriodos']);
+    Route::get('/periodos', [PeriodoController::class, 'getPeriodos']);
 
-    Route::get('/personas/buscar', [PersonasController::class, 'searchPersona']);
-    Route::get('/personas/{id_persona}', [PersonasController::class, 'getPersonaById']);
+    Route::get('/personas/buscar', [PersonaController::class, 'searchPersona']);
+    Route::get('/personas/{id_persona}', [PersonaController::class, 'getPersonaById']);
 
-    Route::get('/materiales-personas', [MaterialesController::class, 'getMaterialesPersonas']);
-    Route::get('/materiales-iglesias', [MaterialesController::class, 'getMaterialesIglesias']);
+    Route::get('/materiales', [MaterialController::class, 'getMaterialesByTipo']);
+    Route::get('/materiales-personas', [MaterialController::class, 'getMaterialesPersonas']);
+    Route::get('/materiales-iglesias', [MaterialController::class, 'getMaterialesIglesias']);
 
-    Route::post('/pedidos', [PedidosController::class, 'store']);
-    Route::put('/pedidos/{id}', [PedidosController::class, 'update']);
-    Route::delete('/pedidos/{id}', [PedidosController::class, 'destroy']);
-    Route::post('/pedidos/{id}/detalles', [PedidosController::class, 'agregarDetalles']);
-    Route::get('/pedidos/{id_pedido}', [PedidosController::class, 'showPedidoByIdPedido']);
-    Route::get('/pedidos/persona/{id_persona}', [PedidosController::class, 'showPedidoByIdPersona']);
-    Route::get('/pedidos/destino/{id_destino}', [PedidosController::class, 'showPedidoByIdDestino']);
-    Route::get('/pedidos/codigo/{codigo}', [PedidosController::class, 'showPedidoByCodigo']);
+    Route::post('/pedidos', [PedidoController::class, 'store']);
+    Route::put('/pedidos/{id}', [PedidoController::class, 'update']);
+    Route::delete('/pedidos/{id}', [PedidoController::class, 'destroy']);
+    Route::post('/pedidos/{id}/detalles', [PedidoController::class, 'agregarDetalles']);
+    Route::get('/pedidos/{id_pedido}', [PedidoController::class, 'showPedidoByIdPedido']);
+    Route::get('/pedidos/persona/{id_persona}', [PedidoController::class, 'showPedidoByIdPersona']);
+    Route::get('/pedidos/destino/{id_destino}', [PedidoController::class, 'showPedidoByIdDestino']);
+    Route::get('/pedidos/codigo/{codigo}', [PedidoController::class, 'showPedidoByCodigo']);
 
-    Route::post('pedidos/pago-abono', [PedidosController::class, 'pagoAbono']);
-    Route::post('pedidos/pago-pasarela', [PedidosController::class, 'pagoPasarela']);
-    Route::post('pedidos/pago-masivo', [PedidosController::class, 'pagoMasivo']);
-    Route::patch('pedidos/{id}/entregar', [PedidosController::class, 'marcarComoEntregado']);
-    Route::patch('pedidos/{id}/anular', [PedidosController::class, 'anularPedido']);
+    Route::post('pedidos/pago-abono', [PedidoController::class, 'pagoAbono']);
+    Route::post('pedidos/pago-pasarela', [PedidoController::class, 'pagoPasarela']);
+    Route::post('pedidos/pago-masivo', [PedidoController::class, 'pagoMasivo']);
+    Route::patch('pedidos/{id}/entregar', [PedidoController::class, 'marcarComoEntregado']);
+    Route::patch('pedidos/{id}/anular', [PedidoController::class, 'anularPedido']);
 
-    /*    Route::post('/pedidos/{id}/pagar', [PedidosController::class, 'pagar']);
-    Route::post('/pedidos/{id}/confirmar-pago', [PedidosController::class, 'confirmarPago']);
-    Route::get('/pedido/consulta/{codigo}', [PedidosController::class, 'buscarPorCodigo']); */
+    /*    Route::post('/pedidos/{id}/pagar', [PedidoController::class, 'pagar']);
+    Route::post('/pedidos/{id}/confirmar-pago', [PedidoController::class, 'confirmarPago']);
+    Route::get('/pedido/consulta/{codigo}', [PedidoController::class, 'buscarPorCodigo']); */
 });
 
 Route::prefix('reportes')->group(function () {

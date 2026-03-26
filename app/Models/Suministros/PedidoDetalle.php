@@ -4,9 +4,9 @@ namespace App\Models\Suministros;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SPedidoDetalle extends Model
+class PedidoDetalle extends Model
 {
-    protected $table = 's_pedido_detalles';
+    protected $table = 'pedido_detalles';
     protected $primaryKey = 'id_detalle';
 
     protected $fillable = [
@@ -19,11 +19,11 @@ class SPedidoDetalle extends Model
 
     public function pedido()
     {
-        return $this->belongsTo(SPedido::class, 'id_pedido', 'id_pedido');
+        return $this->belongsTo(Pedido::class, 'id_pedido', 'id_pedido');
     }
 
     public function material()
     {
-        return $this->belongsTo(SMaterial::class, 'id_material', 'id_material');
+        return $this->belongsTo(Material::class, 'id_material', 'id_material');
     }
 }

@@ -14,16 +14,19 @@ return new class extends Migration
     {
         Schema::create('pedido_pagos', function (Blueprint $table) {
             $table->bigIncrements('id_pago');
-            $table->bigInteger('id_pedido');
+            $table->unsignedBigInteger('id_pedido');
             $table->string('transaccion_id')->unique('pedido_pagos_transaccion_id_key');
-            $table->decimal('monto', 10)->default(0);
+            $table->decimal('monto', 10, 2)->default(0);
             $table->string('metodo_pago', 50)->nullable()->default('EFECTIVO');
             $table->string('estado_visanet', 100)->nullable()->default('COMPLETADO');
             $table->text('comprobante_path')->nullable();
             $table->jsonb('raw_response')->nullable();
             $table->timestamp('fecha_pago')->nullable()->default(DB::raw("now()"));
 
-            $table->foreign(['id_pedido'], 'pedido_pagos_id_pedido_fkey')->references(['id_pedido'])->on('pedidos')->onUpdate('no action')->onDelete('no action');
+            $table->foreign('id_pedido')
+                ->references('id_pedido')
+                ->on('pedidos')
+                ->onDelete('cascade');
         });
     }
 

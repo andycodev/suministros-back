@@ -12,19 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('iglesia_regions', function (Blueprint $table) {
-            $table->bigInteger('id_region')->primary();
+            $table->unsignedBigInteger('id_region')->primary();
             $table->string('nombre', 500);
             $table->string('siglas', 50)->nullable();
             $table->boolean('activo')->default(true);
-            $table->bigInteger('id_campo');
-            $table->bigInteger('id_union');
-            $table->bigInteger('id_organizacion')->nullable();
+            $table->unsignedBigInteger('id_campo');
+            $table->unsignedBigInteger('id_union');
+            $table->unsignedBigInteger('id_organizacion')->nullable();
             $table->timestamps();
             $table->integer('region_7cloud')->nullable();
 
-            $table->foreign(['id_campo'])->references(['id_campo'])->on('iglesia_campos')->onUpdate('no action')->onDelete('no action');
-            $table->foreign(['id_organizacion'])->references(['id_organizacion'])->on('organizacions')->onUpdate('no action')->onDelete('no action');
-            $table->foreign(['id_union'])->references(['id_union'])->on('iglesia_unions')->onUpdate('no action')->onDelete('no action');
+            $table->foreign('id_campo')->references('id_campo')->on('iglesia_campos');
+            $table->foreign('id_organizacion')->references('id_organizacion')->on('organizacions');
+            $table->foreign('id_union')->references('id_union')->on('iglesia_unions');
         });
     }
 

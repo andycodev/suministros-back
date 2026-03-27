@@ -32,7 +32,8 @@ class MaterialController extends Controller
             ->orderBy('precio', 'asc')
             ->get();
 
-        return $this->successResponse($materiales, 'Materiales obtenidos correctamente');
+
+        return $this->successResponse($materiales);
     }
 
     public function getMaterialesIglesias()
@@ -42,7 +43,8 @@ class MaterialController extends Controller
             ->orderBy('precio', 'asc')
             ->get();
 
-        return $this->successResponse($materiales, 'Materiales obtenidos correctamente');
+
+        return $this->successResponse($materiales);
     }
 
     /*  public function store(Request $request)

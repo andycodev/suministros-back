@@ -59,12 +59,10 @@ class PersonaController extends Controller
 
         $iglesia = $persona->iglesia;
         if (!$iglesia) {
-            return response()->json([
-                'message' => 'La persona existe, pero no tiene una iglesia asignada en el sistema.'
-            ], 404);
+            return $this->errorResponse('La persona existe, pero no tiene una iglesia asignada en el sistema.');
         }
 
-        return response()->json([
+        return $this->successResponse([
             'id_persona' => $persona->id_persona,
             'persona'    => "{$persona->nombres} {$persona->ap_paterno} {$persona->ap_materno}",
             'id_union'   => $iglesia->union->id_union,

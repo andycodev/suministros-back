@@ -37,13 +37,11 @@ class ReportController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        if ($pedidos->isEmpty()) {
-            return response()->json([
-                'message' => 'No se encontraron pedidos con los filtros seleccionados.'
-            ], 200);
-        }
+        /*  if ($pedidos->isEmpty()) {
+            return $this->errorResponse('No se encontraron pedidos con los filtros seleccionados.');
+        } */
 
-        return response()->json($pedidos);
+        return $this->successResponse($pedidos);
     }
 
     public function getMisPedidosPagos(Request $request)
@@ -70,12 +68,10 @@ class ReportController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        if ($pedidos->isEmpty()) {
-            return response()->json([
-                'message' => 'No se encontraron pedidos pendientes o creados.'
-            ], 200);
-        }
+        /*   if ($pedidos->isEmpty()) {
+            return $this->errorResponse('No se encontraron pedidos pendientes o creados.');
+        } */
 
-        return response()->json($pedidos);
+        return $this->successResponse($pedidos);
     }
 }

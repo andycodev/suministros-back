@@ -8,9 +8,19 @@ use App\Models\IglesiaDistrito;
 use App\Models\IglesiaIglesia;
 use App\Models\IglesiaRegion;
 use App\Models\IglesiaUnion;
+use App\Models\Suministros\Periodo;
 
 class SetupController extends Controller
 {
+
+    public function getPeriodos()
+    {
+        $periodos = Periodo::orderBy('id_periodo', 'asc')
+            ->where('activo', true)
+            ->get();
+
+        return $this->successResponse($periodos);
+    }
 
     public function getIglesiaUnions()
     {

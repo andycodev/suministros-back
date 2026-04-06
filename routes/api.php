@@ -34,6 +34,23 @@ Route::prefix('setup')->group(function () {
 });
 
 
+/* |--------------------------------------------------------------------------
+| RUTAS PÚBLICAS (Sin Sanctum)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('suministros')->group(function () {
+    // Sacamos estas para que el frontend pueda usarlas antes del login
+    Route::get('/personas/buscar', [PersonaController::class, 'searchPersona']);
+    Route::get('/personas/{id_persona}', [PersonaController::class, 'getPersonaById']);
+    Route::get('/materiales', [MaterialController::class, 'getMaterialesByTipo']);
+    Route::get('/materiales-personas', [MaterialController::class, 'getMaterialesPersonas']);
+    Route::get('/materiales-iglesias', [MaterialController::class, 'getMaterialesIglesias']);
+
+    Route::post('/pedidos/{id}/detalles', [PedidoController::class, 'agregarDetalles']);
+    Route::get('/pedidos/destino/{id_destino}', [PedidoController::class, 'showPedidoByIdDestino']);
+    Route::post('/pedidos', [PedidoController::class, 'store']);
+});
+
 /*
 |--------------------------------------------------------------------------
 | RUTAS PROTEGIDAS (Requieren Token Sanctum)
@@ -47,21 +64,21 @@ Route::middleware('auth:sanctum')->group(function () {
     // Suministros
     Route::prefix('suministros')->group(function () {
         // Route::get('/periodos', [PeriodoController::class, 'getPeriodos']);
-        Route::get('/personas/buscar', [PersonaController::class, 'searchPersona']);
-        Route::get('/personas/{id_persona}', [PersonaController::class, 'getPersonaById']);
+        //Route::get('/personas/buscar', [PersonaController::class, 'searchPersona']);
+        //Route::get('/personas/{id_persona}', [PersonaController::class, 'getPersonaById']);
 
-        Route::get('/materiales', [MaterialController::class, 'getMaterialesByTipo']);
-        Route::get('/materiales-personas', [MaterialController::class, 'getMaterialesPersonas']);
-        Route::get('/materiales-iglesias', [MaterialController::class, 'getMaterialesIglesias']);
+        //Route::get('/materiales', [MaterialController::class, 'getMaterialesByTipo']);
+        //Route::get('/materiales-personas', [MaterialController::class, 'getMaterialesPersonas']);
+        //Route::get('/materiales-iglesias', [MaterialController::class, 'getMaterialesIglesias']);
 
         // Pedidos
-        Route::post('/pedidos', [PedidoController::class, 'store']);
+        // Route::post('/pedidos', [PedidoController::class, 'store']);
         Route::put('/pedidos/{id}', [PedidoController::class, 'update']);
         Route::delete('/pedidos/{id}', [PedidoController::class, 'destroy']);
         Route::post('/pedidos/{id}/detalles', [PedidoController::class, 'agregarDetalles']);
         Route::get('/pedidos/{id_pedido}', [PedidoController::class, 'showPedidoByIdPedido']);
         Route::get('/pedidos/persona/{id_persona}', [PedidoController::class, 'showPedidoByIdPersona']);
-        Route::get('/pedidos/destino/{id_destino}', [PedidoController::class, 'showPedidoByIdDestino']);
+        // Route::get('/pedidos/destino/{id_destino}', [PedidoController::class, 'showPedidoByIdDestino']);    
         Route::get('/pedidos/codigo/{codigo}', [PedidoController::class, 'showPedidoByCodigo']);
 
         // Acciones de Pago y Entrega

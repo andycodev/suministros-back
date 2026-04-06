@@ -18,11 +18,25 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // 1. Errores de Validación (422)
-        $exceptions->render(function (ValidationException $e) {
+        /*    $exceptions->render(function (ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Errores de validación',
                 'data'    => $e->errors(),
+            ], 422);
+        }); */
+        // 1. Errores de Validación (422)
+        $exceptions->render(function (ValidationException $e) {
+            // Obtenemos todos los errores
+            $errors = $e->errors();
+
+            // Extraemos el primer mensaje de error que aparezca
+            $firstError = collect($errors)->flatten()->first();
+
+            return response()->json([
+                'success' => false,
+                'message' => $firstError, // <--- Ahora dirá "Ya existe un pedido..."
+                'data'    => $errors,
             ], 422);
         });
 

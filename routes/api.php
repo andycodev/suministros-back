@@ -48,6 +48,7 @@ Route::prefix('suministros')->group(function () {
 
     Route::post('/pedidos/{id}/detalles', [PedidoController::class, 'agregarDetalles']);
     Route::get('/pedidos/destino/{id_destino}', [PedidoController::class, 'showPedidoByIdDestino']);
+    Route::get('/pedidos/{id_pedido}', [PedidoController::class, 'showPedidoByIdPedido']);
     Route::post('/pedidos', [PedidoController::class, 'store']);
 });
 
@@ -76,7 +77,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/pedidos/{id}', [PedidoController::class, 'update']);
         Route::delete('/pedidos/{id}', [PedidoController::class, 'destroy']);
         Route::post('/pedidos/{id}/detalles', [PedidoController::class, 'agregarDetalles']);
-        Route::get('/pedidos/{id_pedido}', [PedidoController::class, 'showPedidoByIdPedido']);
+        // Route::get('/pedidos/{id_pedido}', [PedidoController::class, 'showPedidoByIdPedido']);
         Route::get('/pedidos/persona/{id_persona}', [PedidoController::class, 'showPedidoByIdPersona']);
         // Route::get('/pedidos/destino/{id_destino}', [PedidoController::class, 'showPedidoByIdDestino']);    
         Route::get('/pedidos/codigo/{codigo}', [PedidoController::class, 'showPedidoByCodigo']);

@@ -12,6 +12,32 @@ class PersonaController extends Controller
 
     public function searchPersona(Request $request)
     {
+        $v = $request->validate([
+            'id_union'    => 'required|integer',
+            'id_campo'    => 'required|integer',
+            'id_distrito' => 'required|integer',
+            'id_iglesia'  => 'required|integer',
+            'documento'   => 'required|string|min:3',
+        ]);
+
+        // Empezamos la consulta desde Persona
+        $personas = Persona::where('documento', 'LIKE', $v['documento'] . '%') // Quitamos el % inicial para usar índice
+            ->where('id_iglesia', $v['id_iglesia']) // Filtro directo (más rápido)
+            ->whereHas('iglesia.distrito.campo.union', function ($query) use ($v) {
+                // Estos filtros aseguran que la iglesia pertenezca a la jerarquía seleccionada
+                $query->where('iglesia_distritos.id_distrito', $v['id_distrito'])
+                    ->where('iglesia_campos.id_campo', $v['id_campo'])
+                    ->where('iglesia_unions.id_union', $v['id_union']);
+            })
+            ->with(['iglesia.distrito.campo.union']) // Carga la jerarquía para mostrarla en el UI
+            ->limit(20)
+            ->get();
+
+        return $this->successResponse($personas);
+    }
+
+    /* public function searchPersona(Request $request)
+    {
         $validated = $request->validate([
             'id_union'    => 'required|integer',
             'id_campo'    => 'required|integer',
@@ -45,7 +71,7 @@ class PersonaController extends Controller
         $mensaje = $personas->isNotEmpty() ? 'Personas encontradas' : 'No se encontraron resultados';
 
         return $this->successResponse($personas, $mensaje);
-    }
+    } */
 
     public function getPersonaById($id_persona)
     {

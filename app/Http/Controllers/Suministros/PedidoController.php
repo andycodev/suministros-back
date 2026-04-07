@@ -191,6 +191,26 @@ class PedidoController extends Controller
         return $this->successResponse($pedidos);
     }
 
+    // Solo traer campos necesarios de las relaciones
+    /*  public function showPedidoByIdDestino($id_destino)
+    {
+        $pedidos = Pedido::with([
+            'persona' => function ($query) {
+                $query->select('id_persona', 'nombres', 'ap_paterno', 'ap_materno');
+            },
+            'destino' => function ($query) {
+                $query->select('id_persona', 'nombres', 'ap_paterno');
+            }
+        ])
+            ->where('id_destino', $id_destino)
+            ->where('estado', 'CREADO')
+            ->whereIn('tipo', ['P', 'I'])
+            ->select('id_pedido', 'id_persona', 'id_destino', 'codigo', 'total_monto', 'tipo') // Solo lo que usa el Pedido
+            ->get();
+
+        return $this->successResponse($pedidos);
+    } */
+
     /*  public function showPedidoByIdPersona($id_persona)
     {
         $pedido = Pedido::with(['detalles.material', 'persona'])
